@@ -1,0 +1,11 @@
+controllers:
+    resource: ../../src/Controller/
+    type: annotation
+
+account:
+    resource: ../../src/Account/Controller/
+    type: annotation
+
+authentication:
+    resource: ../../src/Authentication/Controller/
+    type: annotation
