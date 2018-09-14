@@ -9,7 +9,10 @@
 namespace App\Products\Controller;
 
 use App\Authentication\Annotation\TokenAuthentication;
+use App\Products\CQRS\query\ProductList;
+use App\Products\Entity\Product;
 use App\Tools\Util\ApiResponseObjects;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +27,7 @@ use Nelmio\ApiDocBundle\Annotation\Model;
  * @author Borys Pawluczuk
  * @Route("/v1/products")
  */
-class ApiController extends AbstractController
+class ApiController extends Controller
 {
     use ApiResponseObjects;
 
@@ -38,9 +41,12 @@ class ApiController extends AbstractController
      *                  type="array",
      *                  @SWG\Items(
      *                      type="object",
+     *                      @SWG\Property(property="id", type="integer",),
      *                      @SWG\Property(property="_locale", type="string",),
-     *                      @SWG\Property(property="code", type="string",),
      *                      @SWG\Property(property="name", type="string",),
+     *                      @SWG\Property(property="code", type="string",),
+     *                      @SWG\Property(property="price", type="string",),
+     *                      @SWG\Property(property="currency", type="string",),
      *                  ),
      *              ),
      *     )
@@ -58,18 +64,14 @@ class ApiController extends AbstractController
      *
      * @SWG\Tag(name="products")
      *
-     * @Route("/get", methods={"GET"}, name="get")
+     * @Route("/list", methods={"GET"}, name="list")
      * @return JsonResponse
      */
     public function getProducts()
     {
-        $products[] = [
-            'id' => 1,
-            'name' => 'telewizor',
-            'price' => 9800,
-            'currency' => 'PLN',
-        ];
+        $itemList = new ProductList($this->container, Product::class);
+        $result = $itemList->getList();
 
-        return $this->getSuccessResponse($products);
+        return $this->getSuccessResponse($result);
     }
 }

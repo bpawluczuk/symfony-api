@@ -21,14 +21,6 @@ class BpTestController extends AbstractController
     use ApiResponseObjects;
 
     /**
-     * @Route("/bp/dupa", name="dupa")
-     */
-    public function dupa()
-    {
-        return new Response();
-    }
-
-    /**
      * @Route("/bp/google-oauth", name="google-oauth")
      */
     public function googleOAuth()
