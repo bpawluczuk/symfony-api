@@ -33,25 +33,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Account/Entity'
                 prefix: 'App\Account\Entity'
                 alias: Account
-#            gedmo_translatable:
-#                type: annotation
-#                prefix: Gedmo\Translatable\Entity
-#                dir: '%kernel.project_dir%/vendor/gedmo/doctrine-extensions/lib/Gedmo/Translatable/Entity'
-#                alias: GedmoTranslatable # (optional) it will default to the name set for the mapping
-#                is_bundle: false
-#                there is error on creating migration with translatable entities
             gedmo_translator:
                 type: annotation
                 prefix: Gedmo\Translator\Entity
                 dir: '%kernel.project_dir%/vendor/gedmo/doctrine-extensions/lib/Gedmo/Translator/Entity'
                 alias: GedmoTranslator # (optional) it will default to the name set for the mapping
                 is_bundle: false
-#            gedmo_loggable:
-#                type: annotation
-#                prefix: Gedmo\Loggable\Entity
-#                dir: '%kernel.project_dir%/vendor/gedmo/doctrine-extensions/lib/Gedmo/Loggable/Entity'
-#                alias: GedmoLoggable # (optional) it will default to the name set for the mapping
-#                is_bundle: false
             gedmo_tree:
                 type: annotation
                 prefix: Gedmo\Tree\Entity
@@ -63,4 +50,10 @@ doctrine:
                 type: annotation
                 dir: '%kernel.project_dir%/src/Authentication/Entity'
                 prefix: 'App\Authentication\Entity'
-                alias: Account
+                alias: Authentication
+            Products:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Products/Entity'
+                prefix: 'App\Products\Entity'
+                alias: Products

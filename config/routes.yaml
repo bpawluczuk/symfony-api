@@ -26,3 +26,11 @@ authentication:
     requirements:
       _locale: pl|en
     defaults: { _locale: pl}
+
+product:
+    resource: '../src/Products/Controller/'
+    type: annotation
+    prefix: /api/{_locale}
+    requirements:
+      _locale: pl|en
+    defaults: { _locale: pl}
