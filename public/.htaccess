@@ -1,10 +1,3 @@
 RewriteEngine On
 RewriteCond %{HTTP:Authorization} ^(.*)
 RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
-
-RewriteEngine On
-RewriteCond %{HTTP_HOST} ^www.symfony4api.itse.pl(.*) [NC]
-RewriteRule ^(.*)$ https://symfony4api.itse.pl/$1 [R=301,L]
-
-RewriteCond %{HTTPS} !=on
-RewriteRule ^(.*)$ https://%{SERVER_NAME}%{REQUEST_URI} [R=301,L]
