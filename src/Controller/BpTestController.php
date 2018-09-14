@@ -140,32 +140,4 @@ EOD;
         $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
     }
-
-    /**
-     * @Route("/bp/get-hero2", name="get-hero2")
-     * @TokenAuthentication
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function indexJson2(Request $request)
-    {
-        $result = [
-            [
-                'id' => 1,
-                'name' => 'Mr. Nice',
-            ],
-            [
-                'id' => 2,
-                'name' => 'Narco',
-            ],
-            [
-                'id' => 3,
-                'name' => $request->headers->get('Authorization'),
-            ],
-        ];
-        $response = new JsonResponse($result);
-        $response->headers->set('Cache-Control', 'private, no-cache');
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-        return $response;
-    }
 }
