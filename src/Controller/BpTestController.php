@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+
 use App\Authentication\Annotation\TokenAuthentication;
 use App\Tools\Util\ApiResponseObjects;
 use Firebase\JWT\JWT;
 use Google_Client;
+use Rx\React\Http;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +21,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class BpTestController extends AbstractController
 {
     use ApiResponseObjects;
+
+    public function rxTest(){
+        $source = Http::get('https://www.example.com/');
+    }
 
     /**
      * @Route("/bp/google-oauth", name="google-oauth")
