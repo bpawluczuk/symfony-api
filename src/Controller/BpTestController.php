@@ -7,7 +7,12 @@ use App\Authentication\Annotation\TokenAuthentication;
 use App\Tools\Util\ApiResponseObjects;
 use Firebase\JWT\JWT;
 use Google_Client;
+use React\EventLoop\Factory;
+use Rx\Observable;
 use Rx\React\Http;
+use Rx\Scheduler;
+use Rx\Scheduler\EventLoopScheduler;
+use Rx\Observer\CallbackObserver;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,10 +26,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class BpTestController extends AbstractController
 {
     use ApiResponseObjects;
-
-    public function rxTest(){
-        $source = Http::get('https://www.example.com/');
-    }
 
     /**
      * @Route("/bp/google-oauth", name="google-oauth")
@@ -137,5 +138,171 @@ EOD;
         $response->headers->set('Cache-Control', 'private, no-cache');
         $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
+    }
+
+    /**
+     * @Route("/products/{code}", name="products")
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function productList(Request $request)
+    {
+        $result = [];
+
+        $code = $request->get('code');
+
+        $products = [
+            [
+                "code" => "001",
+                "name" => "telewizor",
+            ],
+            [
+                "code" => "002",
+                "name" => "gitara",
+            ],
+            [
+                "code" => "003",
+                "name" => "komputer",
+            ],
+        ];
+
+        $product = array_filter($products, function ($data) use ($code) {
+            return $data['code'] == $code;
+        });
+
+        foreach ($product as $item) $result = $item;
+
+        $response = new JsonResponse($result);
+        $response->headers->set('Cache-Control', 'private, no-cache');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        return $response;
+    }
+
+    /**
+     * @Route("/prices/{code}", name="prices")
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function priceList(Request $request)
+    {
+        $result = [];
+
+        $code = $request->get('code');
+
+        $prices = [
+            [
+                "code" => "001",
+                "price" => 6700,
+            ],
+            [
+                "code" => "002",
+                "price" => 8500,
+            ],
+            [
+                "code" => "003",
+                "price" => 3000,
+            ],
+        ];
+
+
+        $price = array_filter($prices, function ($data) use ($code) {
+            return $data['code'] == $code;
+        });
+
+        foreach ($price as $item) $result = $item;
+
+        $response = new JsonResponse($result);
+        $response->headers->set('Cache-Control', 'private, no-cache');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        return $response;
+    }
+
+    /**
+     * @Route("/products-rx", name="products-rx")
+     * @return JsonResponse
+     */
+    public function rxTest()
+    {
+        $result = [];
+
+        $products = Http::get('http://symfony-api.localhost/products/002');
+        $prices = Http::get('http://symfony-api.localhost/prices/002');
+
+        $products
+            ->map(function ($response) {
+                return json_decode($response, true);
+            });
+
+        $prices
+            ->map(function ($response) {
+                return json_decode($response, true);
+            });
+
+        $products
+            ->zip([$prices], function ($item_1, $item_2) {
+                $item_j1=json_decode($item_1, true);
+                $item_j2=json_decode($item_2, true);
+                return [
+                    'code' => $item_j1['code'],
+                    'name' => $item_j1['name'],
+                    'price' => $item_j2['price'],
+                ];
+            })
+            ->subscribe(function ($data) {
+                echo var_dump($data);
+            });
+
+
+//        $products
+//            ->concat($prices)
+//            ->subscribe(function ($data) use (&$result) {
+//                echo $data;
+//            });
+
+//        Observable::range(1, 6)
+//            ->map(function($val) {
+//                if ($val == 4) {
+//                    throw new \Exception('error');
+//                }
+//                return $val;
+//            })
+//            ->retry(3)
+//            ->subscribe(function ($data){
+//                echo $data."<br>";
+//            });
+
+
+//        $loop = Factory::create();
+//
+//        Observable::interval(1000)
+//            ->take(5)
+//            ->flatMap(function($i) {
+//                return Observable::of($i + 1);
+//            })
+//            ->subscribe(function($value) {
+//                echo "$value\n";
+//            });
+//
+//        $loop->run();
+
+        //echo var_dump($result);
+
+        return new Response();
+//        $response = new JsonResponse($result);
+//        $response->headers->set('Cache-Control', 'private, no-cache');
+//        $response->headers->set('Access-Control-Allow-Origin', '*');
+//        return $response;
+    }
+
+    public function httpGetAndZip()
+    {
+        $observable = Observable::create(function () {
+        });
+
+        return $observable->zip([
+                Http::get('http://symfony-api.localhost/products'),
+                Http::get('http://symfony-api.localhost/prices')
+            ]
+        );
     }
 }
