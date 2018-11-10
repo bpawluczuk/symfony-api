@@ -4,7 +4,10 @@ namespace App\Controller;
 
 
 use App\Authentication\Annotation\TokenAuthentication;
+use App\Products\Entity\Product;
 use App\Tools\Util\ApiResponseObjects;
+use App\Tools\Util\Stream;
+use Doctrine\Common\Collections\ArrayCollection;
 use Firebase\JWT\JWT;
 use Google_Client;
 use React\EventLoop\Factory;
@@ -18,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use GuzzleHttp\Psr7;
 
 /**
  * Class BpTestController
@@ -240,8 +244,8 @@ EOD;
 
         $products
             ->zip([$prices], function ($item_1, $item_2) {
-                $item_j1=json_decode($item_1, true);
-                $item_j2=json_decode($item_2, true);
+                $item_j1 = json_decode($item_1, true);
+                $item_j2 = json_decode($item_2, true);
                 return [
                     'code' => $item_j1['code'],
                     'name' => $item_j1['name'],
@@ -249,49 +253,26 @@ EOD;
                 ];
             })
             ->subscribe(function ($data) {
-                echo var_dump($data);
+//                echo var_dump($data);
             });
 
+        $em = $this->getDoctrine()->getManager();
 
-//        $products
-//            ->concat($prices)
-//            ->subscribe(function ($data) use (&$result) {
-//                echo $data;
-//            });
+        $repo = $this->getDoctrine()->getRepository(Product::class);
+        $prod = $repo->findAll();
 
-//        Observable::range(1, 6)
-//            ->map(function($val) {
-//                if ($val == 4) {
-//                    throw new \Exception('error');
-//                }
-//                return $val;
-//            })
-//            ->retry(3)
-//            ->subscribe(function ($data){
-//                echo $data."<br>";
-//            });
+        $stream = new Stream($prod);
+
+        $result = $stream->map(function ($value) {
+            return $value->getName();
+        })->asArray();
 
 
-//        $loop = Factory::create();
-//
-//        Observable::interval(1000)
-//            ->take(5)
-//            ->flatMap(function($i) {
-//                return Observable::of($i + 1);
-//            })
-//            ->subscribe(function($value) {
-//                echo "$value\n";
-//            });
-//
-//        $loop->run();
-
-        //echo var_dump($result);
-
-        return new Response();
-//        $response = new JsonResponse($result);
-//        $response->headers->set('Cache-Control', 'private, no-cache');
-//        $response->headers->set('Access-Control-Allow-Origin', '*');
-//        return $response;
+        //return new Response();
+        $response = new JsonResponse($result);
+        $response->headers->set('Cache-Control', 'private, no-cache');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        return $response;
     }
 
     public function httpGetAndZip()
